@@ -1,5 +1,4 @@
 all:
-	lua ../autotad.lua comment-off jogo.c catalogo.c utils.c
 	gcc -g -Wall -Wpedantic -o main *.c 
 
 c:

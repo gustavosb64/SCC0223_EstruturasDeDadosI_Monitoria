@@ -20,7 +20,7 @@ int main(int argc, char *argv[]){
 
     //print_caminho(C);
     printf("%.2f\n",distancia_total(C));
-    //free_caminho(C);
+    free_caminho(C);
 
     return 0;
 }
