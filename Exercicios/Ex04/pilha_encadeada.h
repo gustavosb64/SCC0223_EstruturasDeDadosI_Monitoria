@@ -1,11 +1,13 @@
 #ifndef PILHA_ENCADEADA_H
 #define PILHA_ENCADEADA_H
 
-typedef int elem;
+#include "carta.h"
 
-typedef struct node_ Node;
+typedef Carta* elem;
 
-typedef struct stack_ Stack;
+typedef struct node Node;
+
+typedef struct stack Stack;
 
 Stack* CreateStack();
 
@@ -18,5 +20,8 @@ int Pop(Stack *stack, elem *e);
 Node* SearchElem(Stack *stack, elem e, int *error);
 
 int PrintStack(Stack *stack);
+
+int FreeStack(Stack *stack);
+
 
 #endif

@@ -8,7 +8,6 @@
 #define BUFFER 4096
 char *readline(FILE *stream) {
     char *string = 0;
-    /*
     int pos = 0; 
 
 	do{
@@ -19,26 +18,20 @@ char *readline(FILE *stream) {
 
     }while(string[pos++] != '\n' && !feof(stream));
 
-    / Checa se há a presença do caractere '\r'
-     * e ajusta o espaço alocado para o tamanho exato da string /
+    /* Checa se há a presença do caractere '\r'
+     * e ajusta o espaço alocado para o tamanho exato da string */
     int n;
     if (string[pos-2] == '\r') n = 2;
     else n = 1;
 
     string[pos-n] = '\0';
     string = (char *) realloc(string, pos-(n-1)); // (pos-1) caso haja '\r'
-    int n=1;
-    string[pos-n] = '\0';
-    string = (char *) realloc(string, pos-(n-1)); // (pos-1) caso haja '\r'
-    */
-    
-    string = (char *) calloc(80, sizeof(char));
-    scanf(" %[^\r\n]", string);
-    //printf("string: %s\n",string);
 
     // Caso seja digitado um único caractere e seja 'F'
-    if (strlen(string) == 1 && string[0] == 'F') 
+    if (strlen(string) == 1 && string[0] == 'F'){
+        free(string);
         return NULL;
+    }
 
     return string;
 }

@@ -10,10 +10,11 @@ int main(){
 
     Struct *S;
 
-    S.x = 1;
+    S->x = 1;
     S->y = 3.4;
 
-    printf("%d, %f\n",S.x, S->y);
+    //printf("%d, %f\n",S.x, S-> y);
+    printf("%d, %f\n",S->x, S ->y);
 
 
     return 0;

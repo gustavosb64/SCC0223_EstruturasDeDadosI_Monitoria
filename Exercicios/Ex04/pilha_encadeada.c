@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include "pilha_encadeada.h"
+#include "carta.h"
 
 /*
     Escolhi manter o ponteiro *prev em Node para facilitar o processo de Pop.
@@ -8,13 +9,13 @@
     O custo de armazenamento de um ponteiro é 8 bytes, no caso da pilha, um total de n_elem*8 bytes a mais (mais possíveis bytes armazenados pelo compilador para otimização), custo baixo para a aplicação.
 */
 
-struct node_{
+struct node{
     elem val;
-    struct node_ *next;
-    struct node_ *prev;
+    struct node *next;
+    struct node *prev;
 };
 
-struct stack_{
+struct stack{
     Node *first;
     Node *last;
     int n_elem;
@@ -106,9 +107,33 @@ int PrintStack(Stack *stack){
     Node *aux_node = stack->first;
     
     while(aux_node!=NULL){
-        printf("%d\n",aux_node->val);
+        print_carta(aux_node->val);
         aux_node = aux_node->next;
     }
+
+    return 0;
+}
+
+int FreeStack(Stack *stack){
+    
+    if(IsEmpty(stack)){
+        free(stack);
+        return 1;
+    }
+    
+    Node *aux_node = stack->first;
+    Node *aux_node2 = stack->first;
+    
+    while(aux_node!=NULL){
+        free_carta(aux_node->val);
+
+        aux_node2 = aux_node->next;
+        free(aux_node);
+
+        aux_node = aux_node2;
+    }
+
+    free(stack);
 
     return 0;
 }
