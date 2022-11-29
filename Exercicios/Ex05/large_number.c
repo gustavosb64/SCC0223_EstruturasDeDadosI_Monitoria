@@ -34,15 +34,8 @@ LargeNumber* read_large_number(){
     int s_size = strlen(s_num);
     for (int i = s_size-4; i>=0; i-=4){
         n = atoi(&s_num[i]);
-        
-        /* in case the number is negative, flag_negative
-         * is set to 1 and the number is stored as its norm */
-        if (n < 0){
-            LN->flag_negative = 1;
-            n *= -1;
-        }
-
         add_last_elem_list(LN->number, n);
+
         s_num[i] = '\0';
     }
     if(strlen(s_num) > 0){
@@ -54,17 +47,16 @@ LargeNumber* read_large_number(){
         }
         else{
             n = atoi(s_num);         
-
-            /* in case the number is negative, flag_negative
-             * is set to 1 and the number is stored as its norm */
-            if (n < 0){
-                LN->flag_negative = 1;
-                n *= -1;
-            }
-
             add_last_elem_list(LN->number, n);
         }
     }
+    /* in case the last number is negative, flag_negative is set 
+     * to 1 and the number is stored as its absolut value */
+    if (n < 0){
+        LN->flag_negative = 1;
+        set_opposite_last_elem(LN->number);
+    }
+
     free(s_num);
 
     return LN;
@@ -124,14 +116,16 @@ int is_equal(LargeNumber *LN_1, LargeNumber *LN_2){
     else return 0;
 }
 
-LargeNumber* sum(LargeNumber *LN_1, LargeNumber *LN_2, LargeNumber **LN_res){
+/* Executes LN_res = LN_1 + LN_2 */
+LargeNumber* sum(LargeNumber *LN_1, LargeNumber *LN_2, LargeNumber *LN_res){
 
-    (*LN_res)->number = sum_lists(LN_1->number, LN_2->number);
+    LN_res->number = sum_lists(LN_1->number, LN_2->number);
     
-    return *LN_res;
+    return LN_res;
 }
 
-LargeNumber* subtract(LargeNumber *LN_1, LargeNumber *LN_2, LargeNumber **LN_res){
+/* Executes LN_res = LN_1 - LN_2 */
+LargeNumber* subtract(LargeNumber *LN_1, LargeNumber *LN_2, LargeNumber *LN_res){
 
     /* the largest number is the one to be subtracted from */
     int comp = compare_lists(LN_1->number, LN_2->number);
@@ -139,17 +133,17 @@ LargeNumber* subtract(LargeNumber *LN_1, LargeNumber *LN_2, LargeNumber **LN_res
     if (comp >= 0){
 
         // the resulting number has the same sign as the largest list
-        (*LN_res)->flag_negative = LN_1->flag_negative;
-        (*LN_res)->number = subtract_lists(LN_1->number, LN_2->number);
+        LN_res->flag_negative = LN_1->flag_negative;
+        LN_res->number = subtract_lists(LN_1->number, LN_2->number);
     }
-    else if (comp < 0){
+    else{
 
         // the resulting number has the same sign as the largest list
-        (*LN_res)->flag_negative = LN_2->flag_negative;
-        (*LN_res)->number = subtract_lists(LN_2->number, LN_1->number);
+        LN_res->flag_negative = LN_2->flag_negative;
+        LN_res->number = subtract_lists(LN_2->number, LN_1->number);
     }
 
-    return *LN_res;
+    return LN_res;
 }
 
 /* Executes requested operation */
@@ -157,34 +151,39 @@ static void exe_operation(char *operation, LargeNumber *LN_1, LargeNumber *LN_2)
 
     printf("Resultado :: ");
 
+    // LN_1 > LN_2 
     if (!strcmp(operation, "maior"))
         printf("%s\n", boolean_print(is_greater(LN_1, LN_2)));
+
+    // LN_1 < LN_2 
     else if (!strcmp(operation, "menor"))
         printf("%s\n", boolean_print(is_less(LN_1, LN_2)));
+
+    // LN_1 == LN_2 
     else if (!strcmp(operation, "igual"))
         printf("%s\n", boolean_print(is_equal(LN_1, LN_2)));
 
+    // LN_1 + LN_2 
     else if (!strcmp(operation, "soma")){
 
         LargeNumber *LN_res = create_large_number();
 
-        /* in case both numbers have the same sign */
+        /* if both numbers have the same sign */
         if (LN_1->flag_negative == LN_2->flag_negative){
 
             LN_res->flag_negative = LN_1->flag_negative;
-            LN_res = sum(LN_1, LN_2, &LN_res);
+            LN_res = sum(LN_1, LN_2, LN_res);
 
             print_large_number(LN_res);
         }
 
         /* otherwise, a subtraction is performed */
         else{
-            LN_res = subtract(LN_1, LN_2, &LN_res);
+            LN_res = subtract(LN_1, LN_2, LN_res);
             print_large_number(LN_res);
         }
 
         free_large_number(LN_res);
-
     }
 
     return;

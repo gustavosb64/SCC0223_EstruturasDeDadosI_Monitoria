@@ -22,6 +22,6 @@ char* read_word(){
 }
 
 char* boolean_print(int value){
-    if(value == 0) return "False";
+    if (value == 0) return "False";
     else return "True";
 }

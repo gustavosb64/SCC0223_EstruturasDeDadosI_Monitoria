@@ -1,7 +1,10 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <math.h>
 #include "linked_list.h"
-#include "large_number.h"
+
+#define NUM_OF_DIGITS 4
+#define MAX_NUM pow(10, NUM_OF_DIGITS) 
 
 struct node{
     elem val;
@@ -38,29 +41,26 @@ size_t get_list_size(List *list){
     return list->n_elem; 
 }
 
-int are_lists_equal(List *L1, List *L2){
-    
-    if (L1->n_elem != L2->n_elem) return 0;
+int set_opposite_last_elem(List *list){
 
-    Node *aux_node_1 = L1->first; 
-    Node *aux_node_2 = L2->first; 
+    if (list == NULL || is_empty_list(list)) return 1;
 
-    while(aux_node_1 != NULL){
-        if (aux_node_1->val != aux_node_2->val) return 0;
-        aux_node_1 = aux_node_1->next;
-        aux_node_2 = aux_node_2->next;
-    }
+    list->last->val *= -1;
 
-    return 1;
+    return 0;
 }
 
 static int compare_nodes(Node *N1, Node *N2){
     
+    /* since the numbers are stored backwards,
+     * the comparison starts from the last node */
     int comp = 0;
     if (N1->next != NULL){
         comp = compare_nodes(N1->next, N2->next);
     }
 
+    /* if the previous nodes are equal, 
+     * the current nodes are compared. */
     if (comp == 0){
         if (N1->val == N2->val) return 0;
         if (N1->val > N2->val) return 1;
@@ -71,9 +71,9 @@ static int compare_nodes(Node *N1, Node *N2){
 }
 
 /* Return:
- *  return > 0: L1 is larger
- *  return < 0: L2 is larger
- *  return = 0: both are equal
+ *  return  1: L1 is larger
+ *  return -1: L2 is larger
+ *  return  0: both are equal
 */
 int compare_lists(List *L1, List *L2){
 
@@ -106,19 +106,46 @@ int add_last_elem_list(List *list, elem e){
     return 0;
 }
 
-int add_first_elem_list(List *list, elem e){
-    Node *aux_node = (Node *) malloc(sizeof(Node));
-    if (aux_node == NULL) return 1;
+static int recursive_removal_from_last_elem(Node *node, List *list, elem *e){
 
-    if (is_empty_list(list))
-        aux_node->next = NULL;
-    else 
-        aux_node->next = list->first;
+    /* flag used to sign to the node right before
+     * the last element */
+    int flag_new_last = 0;
 
-    list->first = aux_node;
-    list->first->val = e;
+    if (node->next != NULL)
+        flag_new_last = recursive_removal_from_last_elem(node->next, list, e);
+    else{
+        *e = list->last->val;
+        free(list->last);
 
-    list->n_elem++;
+        list->n_elem--;
+
+        return 1;
+    }
+
+    /* if this flag_new_last == 1, current node is 
+     * the new last element from the list */
+    if (flag_new_last == 1){
+        node->next = NULL;
+        list->last = node;
+    }
+
+    return 0;
+}
+
+int remove_last_elem_list(List *list, elem *e){
+
+    if(is_empty_list(list)) return 1;
+
+    int flag_new_last = recursive_removal_from_last_elem(list->first, list, e);
+
+    /* if flag_new_last == 1, 
+     * the list is now empty */
+    if (flag_new_last == 1){
+        list->first = NULL;
+        list->last = NULL;
+    }
+
     return 0;
 }
 
@@ -145,8 +172,8 @@ static void print_nodes_backwards(Node *node){
         return;
     }
 
-    /* adds '0' between the numbers when needed */
-    int i=1000;
+    /* adds '0' between the numbers when needed. */
+    int i = MAX_NUM/10;
     while(node->val < i && i > 1){
         printf("0");
         i = i/10;
@@ -201,9 +228,9 @@ List* sum_lists(List *L1, List *L2){
 
         /* if the sum has more than 4 digits, the carry 
          * value must be incremented to the next node */
-        if (cur_sum >= 10000){
+        if (cur_sum >= MAX_NUM){
             carry = 1;
-            cur_sum -= 10000;
+            cur_sum -= MAX_NUM;
         } 
         else{
             carry = 0;
@@ -217,17 +244,14 @@ List* sum_lists(List *L1, List *L2){
 
     /* if there are still nodes in one of the lists, they are copied
      * into the resulting list */
-    while (aux_node_1 != NULL){
-        aux_node_1->val += carry;
+    Node *remaining_nodes = NULL;
+    if (aux_node_1 != NULL) remaining_nodes = aux_node_1;
+    else if (aux_node_2 != NULL) remaining_nodes = aux_node_2;
+    while (remaining_nodes != NULL){
+        remaining_nodes->val += carry;
         carry = 0;
-        add_last_elem_list(L_res, aux_node_1->val);
-        aux_node_1 = aux_node_1->next;
-    }
-    while (aux_node_2 != NULL){
-        aux_node_2->val += carry;
-        carry = 0;
-        add_last_elem_list(L_res, aux_node_2->val);
-        aux_node_2 = aux_node_2->next;
+        add_last_elem_list(L_res, remaining_nodes->val);
+        remaining_nodes = remaining_nodes->next;
     }
 
     /* if carry is not 0, it must be incremented 
@@ -250,12 +274,10 @@ List* subtract_lists(List *L1, List *L2){
     while (aux_node_1 != NULL && aux_node_2 != NULL){
         
         cur_val = (aux_node_1->val - carry) - aux_node_2->val;
-        //printf("cur_val before: %d\n",cur_val);
 
         if (cur_val < 0){
             carry = 1;
-            cur_val += 10000;
-            //printf("cur_val after: %d\n",cur_val);
+            cur_val += MAX_NUM;
         }
         else{
             carry = 0;
@@ -269,15 +291,21 @@ List* subtract_lists(List *L1, List *L2){
 
     /* if there are still nodes in one of the lists, they are copied
      * into the resulting list */
-    while (aux_node_1 != NULL){
-        aux_node_1->val -= carry;
-        add_last_elem_list(L_res, aux_node_1->val);
-        aux_node_1 = aux_node_1->next;
+    Node *remaining_nodes = NULL;
+    if (aux_node_1 != NULL) remaining_nodes = aux_node_1;
+    else if (aux_node_2 != NULL) remaining_nodes = aux_node_2;
+    while (remaining_nodes != NULL){
+        remaining_nodes->val -= carry;
+        carry = 0;
+        add_last_elem_list(L_res, remaining_nodes->val);
+        remaining_nodes = remaining_nodes->next;
     }
-    while (aux_node_2 != NULL){
-        aux_node_2->val -= carry;
-        add_last_elem_list(L_res, aux_node_2->val);
-        aux_node_2 = aux_node_2->next;
+
+    /* if the last element is now 0, it 
+     * must be removed from the list */
+    if(L_res->last->val == 0){
+        elem e;
+        remove_last_elem_list(L_res, &e);
     }
 
     return L_res;

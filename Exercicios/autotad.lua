@@ -84,7 +84,7 @@ function write_contents(file_c_r, file_h_w, comment_off, dict_functions_comments
 
         elseif line:find("{") then
 
-            if curly_braces_control == 0 then
+            if curly_braces_control == 0 and not line:find("static") then
                 line = adapt_line(line, prev_line)
 
                 -- Getting function name as key
@@ -107,16 +107,16 @@ function write_contents(file_c_r, file_h_w, comment_off, dict_functions_comments
                 file_h_w:write(str_comment_section)
                 file_h_w:write(line)
 
-                end
-                
-                -- If AUTOTAD_PRIVATE is active, curly_braces_control is decremented
-                if curly_braces_control >= 0 then 
-                    curly_braces_control = curly_braces_control + 1
-                else
-                    curly_braces_control = curly_braces_control - 1
-                end
-                
             end
+                
+            -- If AUTOTAD_PRIVATE is active, curly_braces_control is decremented
+            if curly_braces_control >= 0 then 
+                curly_braces_control = curly_braces_control + 1
+            else
+                curly_braces_control = curly_braces_control - 1
+            end
+                
+        end
 
         if line:find("}") then
             if curly_braces_control >= 0 then 

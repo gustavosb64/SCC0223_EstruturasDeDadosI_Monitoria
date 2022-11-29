@@ -15,9 +15,9 @@ int is_less(LargeNumber *LN_1, LargeNumber *LN_2);
 
 int is_equal(LargeNumber *LN_1, LargeNumber *LN_2);
 
-LargeNumber* sum(LargeNumber *LN_1, LargeNumber *LN_2, LargeNumber **LN_res);
+LargeNumber* sum(LargeNumber *LN_1, LargeNumber *LN_2, LargeNumber *LN_res);
 
-LargeNumber* subtract(LargeNumber *LN_1, LargeNumber *LN_2, LargeNumber **LN_res);
+LargeNumber* subtract(LargeNumber *LN_1, LargeNumber *LN_2, LargeNumber *LN_res);
 
 void free_large_number(LargeNumber *LN);
 

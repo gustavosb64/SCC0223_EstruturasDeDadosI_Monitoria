@@ -1,6 +1,6 @@
 all:
 	lua ../autotad.lua comment-off large_number.c linked_list.c utils.c
-	gcc -g -Wall -Wpedantic -o main *.c 
+	gcc -g -Wall -Wpedantic -o main *.c -lm
 
 c:
 	gcc -g -o main *.c 
