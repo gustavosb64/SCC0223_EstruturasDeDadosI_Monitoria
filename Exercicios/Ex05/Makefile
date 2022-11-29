@@ -1,12 +1,15 @@
+UTIL = LargeNumber/linked_list.c LargeNumber/large_number.c Utils/utils.c
+MAIN = main.c
+BINARY = main
+
 all:
-	lua ../autotad.lua comment-off large_number.c linked_list.c utils.c
-	gcc -g -Wall -Wpedantic -o main *.c -lm
+	gcc -Wall $(MAIN) $(UTIL) -o $(BINARY) 
 
 c:
-	gcc -g -o main *.c 
+	gcc $(MAIN) $(UTIL) -o $(BINARY) 
 
 run:
-	./main
+	./$(BINARY)
 
-debug:
-	valgrind --leak-check=full --show-leak-kinds=all --track-origins=yes -s ./main
+valgrind:
+	valgrind --leak-check=full --show-leak-kinds=all --track-origins=yes -s ./$(BINARY)

@@ -3,7 +3,7 @@
 #include <string.h>
 #include "linked_list.h"
 #include "large_number.h"
-#include "utils.h"
+#include "../Utils/utils.h"
 
 struct largeNumber{
     List *number;

@@ -1,10 +1,6 @@
 #include <stdio.h>
 #include <stdlib.h>
-#include <math.h>
 #include "linked_list.h"
-
-#define NUM_OF_DIGITS 4
-#define MAX_NUM pow(10, NUM_OF_DIGITS) 
 
 struct node{
     elem val;
@@ -106,49 +102,6 @@ int add_last_elem_list(List *list, elem e){
     return 0;
 }
 
-static int recursive_removal_from_last_elem(Node *node, List *list, elem *e){
-
-    /* flag used to sign to the node right before
-     * the last element */
-    int flag_new_last = 0;
-
-    if (node->next != NULL)
-        flag_new_last = recursive_removal_from_last_elem(node->next, list, e);
-    else{
-        *e = list->last->val;
-        free(list->last);
-
-        list->n_elem--;
-
-        return 1;
-    }
-
-    /* if this flag_new_last == 1, current node is 
-     * the new last element from the list */
-    if (flag_new_last == 1){
-        node->next = NULL;
-        list->last = node;
-    }
-
-    return 0;
-}
-
-int remove_last_elem_list(List *list, elem *e){
-
-    if(is_empty_list(list)) return 1;
-
-    int flag_new_last = recursive_removal_from_last_elem(list->first, list, e);
-
-    /* if flag_new_last == 1, 
-     * the list is now empty */
-    if (flag_new_last == 1){
-        list->first = NULL;
-        list->last = NULL;
-    }
-
-    return 0;
-}
-
 int print_list(List *list){
 
     if(is_empty_list(list)) return 1;
@@ -173,7 +126,7 @@ static void print_nodes_backwards(Node *node){
     }
 
     /* adds '0' between the numbers when needed. */
-    int i = MAX_NUM/10;
+    int i=1000;
     while(node->val < i && i > 1){
         printf("0");
         i = i/10;
@@ -228,9 +181,9 @@ List* sum_lists(List *L1, List *L2){
 
         /* if the sum has more than 4 digits, the carry 
          * value must be incremented to the next node */
-        if (cur_sum >= MAX_NUM){
+        if (cur_sum >= 10000){
             carry = 1;
-            cur_sum -= MAX_NUM;
+            cur_sum -= 10000;
         } 
         else{
             carry = 0;
@@ -277,7 +230,7 @@ List* subtract_lists(List *L1, List *L2){
 
         if (cur_val < 0){
             carry = 1;
-            cur_val += MAX_NUM;
+            cur_val += 10000;
         }
         else{
             carry = 0;
@@ -301,12 +254,12 @@ List* subtract_lists(List *L1, List *L2){
         remaining_nodes = remaining_nodes->next;
     }
 
-    /* if the last element is now 0, it 
-     * must be removed from the list */
-    if(L_res->last->val == 0){
-        elem e;
-        remove_last_elem_list(L_res, &e);
+    /* if carry is not 0, it must be decremented 
+     * from the resulting number 
+    if(carry > 0){
+        //remove_last_elem_list(L_res, carry);
     }
+    */
 
     return L_res;
 }

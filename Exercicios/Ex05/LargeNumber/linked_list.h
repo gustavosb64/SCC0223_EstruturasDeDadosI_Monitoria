@@ -20,8 +20,6 @@ int compare_lists(List *L1, List *L2);
 
 int add_last_elem_list(List *list, elem e);
 
-int remove_last_elem_list(List *list, elem *e);
-
 int print_list(List *list);
 
 int print_list_no_space(List *list);
